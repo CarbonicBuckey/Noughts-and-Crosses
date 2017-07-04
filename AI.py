@@ -16,25 +16,23 @@ gridShape1 = [["", "", ""], ["", "", ""], ["", "", ""]]
 
 def AI():
     global turn, check, grid
-    if gridShape[1][1] == 0:
-        x = 200
-        y = 200
-        return(gridCalc(x, y))
-    elif gridShape[1][1] != 0:
-        for x in check:
-            if sum(x) == 200:
+    if gridShape[1][1] == 0: #If the center grid is empty return middle grid
+        return(1, 1)
+    elif gridShape[1][1] != 0: #If the center grid is not empty
+        for x in check: #For objects in check
+            if sum(x) == 200: #If the sum of the objects is == 200, i.e. 1 round away from the ai from winning
                 for k in x:
-                    if k == 0:
-                        if check.index(x) <3:
+                    if k == 0: #Find the empty place in the list
+                        if check.index(x) <3: #if it is row
                             return( [check.index(x),x.index(k)])
-                        if 2<check.index(x)<6:
+                        if 2<check.index(x)<6:#if it is coloum
                             return([x.index(k),check.index(x)-3])
-                        if check.index(x) == 6:
+                        if check.index(x) == 6: #if it is \
                             return ([x.index(k),x.index(k)])
-                        if check.index(x) ==7:
+                        if check.index(x) ==7: #if it is /
                             return ([x.index(k),2-x.index(k)])
-        for x in check:
-            if sum(x) == 20:
+        for x in check: #for objects in check
+            if sum(x) == 20: #if the player is about to win
                 for k in x:
                     if k == 0:
                         if check.index(x) <3:
@@ -46,18 +44,11 @@ def AI():
                         if check.index(x) ==7:
                             return ([x.index(k),2-x.index(k)])                        
         
-        for x in gridShape:
-            for k in x:
-                if k == 0:
+        for x in gridShape: #For each row
+            for k in x: #for each grid
+                if k == 0: #if the grid is empty
                     if check.index(x) <3:
                         return( [check.index(x),x.index(k)])
-                    if 2<check.index(x)<6:
-                        return([x.index(k),check.index(x)-3])
-                    if check.index(x) == 6:
-                        return ([x.index(k),x.index(k)])
-                    if check.index(x) ==7:
-                        return ([x.index(k),2-x.index(k)]) 
-
 
 #Start function to initially set up the window
 def main():
@@ -161,14 +152,14 @@ def clickLoc(event):
             display()
         
         check = [
-            gridShape[0],
-            gridShape[1],
-            gridShape[2],
-            [gridShape[0][0],gridShape[1][0],gridShape[2][0]],
-            [gridShape[0][1],gridShape[1][1],gridShape[2][1]],
-            [gridShape[0][2],gridShape[1][2],gridShape[2][2]],
-            [gridShape[0][0],gridShape[1][1],gridShape[2][2]],
-            [gridShape[0][2],gridShape[1][1],gridShape[2][0]]
+            gridShape[0], #R1
+            gridShape[1], #R2
+            gridShape[2], #R3
+            [gridShape[0][0],gridShape[1][0],gridShape[2][0]], #Column 1
+            [gridShape[0][1],gridShape[1][1],gridShape[2][1]], #Column 2
+            [gridShape[0][2],gridShape[1][2],gridShape[2][2]], #Column 3
+            [gridShape[0][0],gridShape[1][1],gridShape[2][2]], #Cross \
+            [gridShape[0][2],gridShape[1][1],gridShape[2][0]] #Cross /
             ]   
 
         if ai == 'Y':
