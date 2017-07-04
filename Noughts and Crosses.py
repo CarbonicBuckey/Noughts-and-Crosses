@@ -1,125 +1,156 @@
 """
-Kevin Kim, Ron Zhang
-Naughts and Crosses
+Noughts and Crosses
+Ron Zhang, Kevin Kim
 """
 
-#Importing Modules
 from tkinter import *
 
 mode = "Player vs Player"
-turn = "x"
-round = 0
 
-gridShape = [["", "", ""], ["", "", ""], ["", "", ""]]
-
-#Start function to initially set up the window
+#main function that will set up the window
 def main():
-    global window, canvas
-
-    #Creating and defining main window
+    global canvas
+    #Initialising window
     window = Tk()
-    window.title("Naughts and Crosses")
+    window.title("Noughts and Crosses")
 
-    #Creating objects inside the window
-    sideButtonFrame = Frame(window, height=500)
-    canvas = Canvas(window, width=500, height=500, bg="#fcd054")
+    #Setting up the side frame
+    sideFrame = Frame(window)
 
-    #Drawing stuff inside the canvas
-    init()
+    #Setting up objects inside frame
+    modeButton = Button(sideFrame, text="Change Mode", width=15, command=modeToggle)
+    clearButton = Button(sideFrame, text="Clear", width=15, command=init)
 
-    #Creating objects inside sideButtonFrame
-    modeButton = Button(sideButtonFrame, text="Change Mode", command=modeToggle)
-    clearButton = Button(sideButtonFrame, text="Clear", command=clear)
-
-    #Packing everything inside a frame
     modeButton.pack()
     clearButton.pack()
 
-    #Packing everything inside the window
-    sideButtonFrame.pack(side=RIGHT)
+    #Setting up the canvas
+    canvas = Canvas(window, width=500, height=500, bg="#77eeff")
+
+    #Packing things
+    sideFrame.pack(side=RIGHT)
     canvas.pack(side=LEFT)
+
+    #Drawing things in canvas
+    init()
 
     window.mainloop()
 
-#function to set up all the basic things such as the canvas. Seperate from main so that it can be run again
-def init():
-    global canvas, window, shapeX, shapeO, turnText, modeText, roundText
+#Function to draw and update the nessesary components
+def init(event=None):
+    global modeText, roundText, turnText, shapeX, shapeO
 
-    #Establishing the grid inside the canvas
+    clear()#Defining default variables
+
+    #Establishing the grid inside the canvas - Border 10, Square width = 150, actual width = 140
     for y in range(3):
         for x in range(3):
-            canvas.create_rectangle(25+150*x, 25+150*y, 175+150*x, 175+150*y, width=10) #Border 10, Square width = 140
+            canvas.create_rectangle(
+                                    25 + 150 * x, 25 + 150 * y,
+                                    175 + 150 * x, 175 + 150 * y,
+                                    width=10
+                                    )
 
-    #Establishing the text on top of grid
+    #Creating the display text at the top
     modeText = canvas.create_text(20, 10, text="Mode = {}".format(mode), anchor=W)
     turnText = canvas.create_text(250, 10, text="Turn = {}".format(turn))
-    roundText = canvas.create_text(480, 10, text="Round = {}".format(round), anchor=E)
+    roundText = canvas.create_text(480, 10, text="Round = {}".format(gameRound), anchor=E)
+
 
     #Drawing the shapes for the first time
-    initCoords = [-100, -100, -100, -100] #Setting coords outside the canvas so that the variable exists, and can be modified later
-    colour = "#977c32"
+    initCoords = [-100, -100, -100, -100]
+    #Setting coords outside the canvas so that the variable exists, and can be modified later
 
-    shapeX = canvas.create_polygon(initCoords, fill=colour)
-    shapeO = canvas.create_oval(initCoords, width="15", outline=colour)
+    colour = "#53a6b2"
+    shapeX = canvas.create_polygon(initCoords, fill=colour) #variable for the shape X
+    shapeO = canvas.create_oval(initCoords, width="15", outline=colour) #variable for the shape Y
 
     #Binding the mouse
     canvas.bind("<Motion>", hoverLoc)
     canvas.bind("<Button-1>", clickLoc)
 
-#Deciding the location of mouse hover
+#Update display
+def display():
+    canvas.itemconfig(modeText, text="Mode = {}".format(mode))
+    canvas.itemconfig(turnText, text="Turn = {}".format(turn))
+    canvas.itemconfig(roundText, text="Round = {}".format(gameRound))
+
+def modeToggle():
+    global mode, canvas
+    if mode == "Player vs Player":
+        mode = "Player vs AI"
+    elif mode == "Player vs AI":
+        mode = "Player vs Player"
+
+    display()
+
+def clear():
+    global turn, gameRound, gridShape
+    turn = "x"
+    gameRound = 0
+    gridShape = [["","",""],["","",""],["","",""]]
+
+    canvas.delete(ALL)
+
 def hoverLoc(motion):
-    global shapeX, shapeO
+    #Defining x and y
     x = motion.x
     y = motion.y
 
+    #Converting x and y into grid coords
     grid = gridCalc(x, y)
 
-    #if grid not returned "", and the grid is empty
-    if grid != "" and gridShape[grid[1]][grid[0]] == "":
-        coord = objectLoc(grid)
+    #If mouse is inside a valid grid, and there are no previous inputs in that grid
+    if grid != "MouseOutOfGrid" and gridShape[grid[1]][grid[0]] == "":
+        coord = objectLoc(grid)#Defining the the coordinate of the object
 
+        #moving object to position
         if turn == 'x':
             canvas.coords(shapeX, coord)
         elif turn == "o":
             canvas.coords(shapeO, coord)
 
-#Decidig the location of mouse click and drawing the shapes
+
 def clickLoc(event):
-    global turn, round
+    global turn, gameRound
+
+    #Defining x and y coordinate of mouse
     x = event.x
     y = event.y
-    colour = "#000000"
 
+    #Translating the x y coords into grid coords
     grid = gridCalc(x, y)
 
-    #if grid not returned "", and the grid is empty
-    if grid != "" and gridShape[grid[1]][grid[0]] == "":
+    #If mouse is inside a valid grid, and there are no previous inputs in that grid
+    if grid != "MouseOutOfGrid" and gridShape[grid[1]][grid[0]] == "":
+
+        #translating grid coord to object coord
         coord = objectLoc(grid)
-        round += 1
+
+        #Adding one to round
+        gameRound += 1
 
         if turn == "x":
-            canvas.create_polygon(coord, fill=colour)
+            canvas.create_polygon(coord)
             gridShape[grid[1]][grid[0]] = "x"
             game = gameChecker(grid)
+
             turn = "o"
             display()
 
         elif turn == "o":
-            canvas.create_oval(coord, width="15", outline=colour)
+            canvas.create_oval(coord, width="15")
             gridShape[grid[1]][grid[0]] = "o"
             game = gameChecker(grid)
+
             turn = "x"
             display()
 
     if 'game' in locals():
         if game == "fin":
-            canvas.bind("<Button-1>", clickToClear)
+            canvas.bind("<Button-1>", init)
 
-#Function to clear everything after the game is over, and the window has been clicked
-def clickToClear(E):
-    clear()
-
-#Calculating the grid based on mouse positions
+#Translates xy coords to  grid coords
 def gridCalc(x, y):
     if y in range(30, 170): #Row 1
         gridY = 0
@@ -130,7 +161,7 @@ def gridCalc(x, y):
         elif x in range(330, 470):
             gridX = 2
         else:
-            return("")
+            return("MouseOutOfGrid")
 
     elif y in range(180, 320): #Row 2
         gridY = 1
@@ -141,7 +172,7 @@ def gridCalc(x, y):
         elif x in range(330, 470):
             gridX = 2
         else:
-            return("")
+            return("MouseOutOfGrid")
 
     elif y in range(330, 470): #Row 3
         gridY = 2
@@ -152,14 +183,14 @@ def gridCalc(x, y):
         elif x in range(330, 470):
             gridX = 2
         else:
-            return("")
+            return("MouseOutOfGrid")
 
     else:
-        return("")
+        return("MouseOutOfGrid")
 
     return([gridX, gridY])
 
-#Grid to object point converter
+#Function to translate grid coords to object coords
 def objectLoc(grid):
     #Polygon points
     pointX = [#Points for X
@@ -188,49 +219,22 @@ def objectLoc(grid):
     elif turn == "x":
         return(pointX)
 
-#Toggling mode
-def modeToggle():
-    global mode
-    if mode == "Player vs Player":
-        mode = "Player vs AI"
-    elif mode == "Player vs AI":
-        mode = "Player vs Player"
-
-    clear()
-    display()
-
-#Clearing everything
-def clear():
-    global turn, round, gridShape
-    turn = "x"
-    round = 0
-    gridShape = [["", "", ""], ["", "", ""], ["", "", ""]]
-    canvas.delete(ALL)
-
-    init()
-
-#Setting up the display
-def display():#Updating Displays
-    canvas.itemconfig(modeText, text="Mode = {}".format(mode))
-    canvas.itemconfig(turnText, text="Turn = {}".format(turn))
-    canvas.itemconfig(roundText, text="Round = {}".format(round))
-
-#Function to check if the outcome of the game had been decided
 def gameChecker(grid):
     x = grid[0]
     y = grid[1]
 
-    #checking basic row win
+    # checking basic row win
     if gridShape[y] == ["x", "x", "x"] or gridShape[y] == ["o", "o", "o"]:
-        canvas.create_text([250, 250], text="Player {} wins!".format(turn), fill="#ee1fd0", font="CentryGothic 50 bold")
+        canvas.create_text([250, 250], text="Player {} wins!".format(turn), fill="#ee1fd0",
+                           font="CentryGothic 50 bold")
         canvas.create_text([250, 300], text="Please Click to Continue", fill="#ee1fd0", font="centrygothic 20 bold")
 
-        return("fin")
+        return ("fin")
 
-    #checking for all other types of wins
+    # checking for all other types of wins
     else:
 
-        #defining the rows such that all rows are defined in terms of y
+        # defining the rows such that all rows are defined in terms of y
         if y == 0:
             y2 = 1
             y3 = 2
@@ -241,33 +245,40 @@ def gameChecker(grid):
             y2 = 0
             y3 = 1
 
-        #checking to see if all objects in the same position in each row is the same
+        # checking to see if all objects in the same position in each row is the same
         if gridShape[y][x] == gridShape[y2][x] == gridShape[y3][x] != "":
-            canvas.create_text([250, 250], text="Player {} wins!".format(turn), fill="#ee1fd0", font="CentryGothic 50 bold")
-            canvas.create_text([250, 300], text="Please Click to Continue", fill="#ee1fd0", font="centrygothic 20 bold")
+            canvas.create_text([250, 250], text="Player {} wins!".format(turn), fill="#ee1fd0",
+                               font="CentryGothic 50 bold")
+            canvas.create_text([250, 300], text="Please Click to Continue", fill="#ee1fd0",
+                               font="centrygothic 20 bold")
 
-            return("fin") #returning a value to confirm that the game's outcome has been decided
+            return ("fin")  # returning a value to confirm that the game's outcome has been decided
 
         elif gridShape[0][0] == gridShape[1][1] == gridShape[2][2] != "":
-            canvas.create_text([250, 250], text="Player {} wins!".format(turn), fill="#ee1fd0", font="CentryGothic 50 bold")
-            canvas.create_text([250, 300], text="Please Click to Continue", fill="#ee1fd0", font="centrygothic 20 bold")
+            canvas.create_text([250, 250], text="Player {} wins!".format(turn), fill="#ee1fd0",
+                               font="CentryGothic 50 bold")
+            canvas.create_text([250, 300], text="Please Click to Continue", fill="#ee1fd0",
+                               font="centrygothic 20 bold")
 
-            return("fin")
+            return ("fin")
 
-        elif gridShape[0][2] == gridShape[1][1] ==  gridShape[2][0] != "":
-            canvas.create_text([250, 250], text="Player {} wins!".format(turn), fill="#ee1fd0", font="CentryGothic 50 bold")
-            canvas.create_text([250, 300], text="Please Click to Continue", fill="#ee1fd0", font="centrygothic 20 bold")
+        elif gridShape[0][2] == gridShape[1][1] == gridShape[2][0] != "":
+            canvas.create_text([250, 250], text="Player {} wins!".format(turn), fill="#ee1fd0",
+                               font="CentryGothic 50 bold")
+            canvas.create_text([250, 300], text="Please Click to Continue", fill="#ee1fd0",
+                               font="centrygothic 20 bold")
 
-            return("fin")
+            return ("fin")
 
 
         elif "" not in gridShape[0] and "" not in gridShape[1] and "" not in gridShape[2]:
             canvas.create_text([250, 250], text="Tied Game!", fill="#ee1fd0", font="CentryGothic 50 bold")
-            canvas.create_text([250, 300], text="Please Click to Continue", fill="#ee1fd0", font="centrygothic 20 bold")
+            canvas.create_text([250, 300], text="Please Click to Continue", fill="#ee1fd0",
+                               font="centrygothic 20 bold")
 
-            return("fin")
+            return ("fin")
 
         else:
-            return(None) #Do not return anything if none of the conditions are true
-
+            return (None)  # Do not return anything if none of the conditions are true
 main()
+
