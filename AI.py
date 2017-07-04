@@ -164,31 +164,23 @@ def clickLoc(event):
 
         if ai == 'Y':
             grid = AI()
-
             colour = "#000000"
-            
-            
             if grid != "" and gridShape[grid[0]][grid[1]] == 0:
                 coord = objectLoc(grid)
-        
                 if turn == "x":
                     canvas.create_polygon(coord, fill=colour)
-                    
                     gridShape1[grid[1]][grid[0]] = "x"
                     gridShape[grid[0]][grid[1]] = 10
                     gameChecker(grid)
                     turn = "o"
-                    
                     display()
                 elif turn == "o":
                     canvas.create_oval(coord, width="15", outline=colour)
-                    
                     gridShape1[grid[1]][grid[0]] = "o"
                     gridShape[grid[0]][grid[1]] = 100
                     gameChecker(grid)
-                    turn = "x"            
-                    
-                    display()        
+                    turn = "x"
+                    display()
 
     if 'game' in locals():
         if game == "fin":
