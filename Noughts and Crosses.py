@@ -4,6 +4,7 @@ Ron Zhang, Kevin Kim
 """
 
 from tkinter import *
+from collections import Counter
 
 mode = "Player vs Player"
 
@@ -67,7 +68,11 @@ def init(event=None):
 
     #Binding the mouse
     canvas.bind("<Motion>", hoverLoc)
-    canvas.bind("<Button-1>", clickLoc)
+
+    if mode == "Player vs Player":
+        canvas.bind("<Button-1>", clickLoc)
+    elif mode == "Player vs AI":
+        canvas.bind("<Button-1>", Ai)
 
 #Update display
 def display():
@@ -82,7 +87,7 @@ def modeToggle():
     elif mode == "Player vs AI":
         mode = "Player vs Player"
 
-    display()
+    init()
 
 def clear():
     global turn, gameRound, gridShape
@@ -118,17 +123,13 @@ def clickLoc(event):
     x = event.x
     y = event.y
 
-    #Translating the x y coords into grid coords
-    grid = gridCalc(x, y)
+    grid = gridCalc(x, y)# Translating the x y coords into grid coords
 
     #If mouse is inside a valid grid, and there are no previous inputs in that grid
     if grid != "MouseOutOfGrid" and gridShape[grid[1]][grid[0]] == "":
 
-        #translating grid coord to object coord
-        coord = objectLoc(grid)
-
-        #Adding one to round
-        gameRound += 1
+        coord = objectLoc(grid) #translating grid coord to object coord
+        gameRound += 1 #Adding one to round
 
         if turn == "x":
             canvas.create_polygon(coord)
@@ -149,6 +150,226 @@ def clickLoc(event):
     if 'game' in locals():
         if game == "fin":
             canvas.bind("<Button-1>", init)
+
+def Ai(event):
+    global turn, gameRound
+
+    #Defining x and y coordinate of mouse
+    x = event.x
+    y = event.y
+
+    grid = gridCalc(x, y)# Translating the x y coords into grid coords
+
+    #If mouse is inside a valid grid, and there are no previous inputs in that grid
+    if grid != "MouseOutOfGrid" and gridShape[grid[1]][grid[0]] == "":
+
+        coord = objectLoc(grid) #translating grid coord to object coord
+
+        gameRound += 1 #Adding one to round
+
+        canvas.create_polygon(coord) #No need to check to see if turn == "x" as turn is going to be "x"
+        gridShape[grid[1]][grid[0]] = "x"
+        game = gameChecker(grid)
+        turn = "o"
+        display()
+
+        stopGame = 0
+
+        if 'game' in locals():
+            if game == "fin":
+                canvas.bind("<Button-1>", init)
+                stopGame = 1
+
+        if stopGame == 0:
+            grid = priorities()
+            print(objectLoc([0, 1]))
+            coord = objectLoc(grid)
+
+            canvas.create_oval(coord, width="15")
+            gridShape[grid[1]][grid[0]] = "o"
+            game = gameChecker(grid)
+
+            turn = "x"
+            display()
+
+        if 'game' in locals():
+            if game == "fin":
+               canvas.bind("<Button-1>", init)
+
+def priorities():
+        rowCheck = [gridShape[0], gridShape[1], gridShape[2]]
+        columnCheck = [list(x) for x in zip(rowCheck[0], rowCheck[1], rowCheck[2])]
+        leftRightCheck = [gridShape[0][0], gridShape[1][1], gridShape[2][2]]
+        rightLeftCheck = [gridShape[0][2], gridShape[1][1], gridShape[2][0]]
+
+        for rowN, row in enumerate(rowCheck):
+            obCount = Counter(row)
+            if obCount["o"] == 2 and ("" in row): # Checking to see if AI is 1 move away from winning in rows
+                grid = [row.index(""), rowN]
+                return(grid)
+
+        for columnN, column in enumerate(columnCheck): # Checking to see if AI is 1 move away from winning in
+            obCount = Counter(column)
+            if obCount["o"] == 2 and ("" in column):
+                grid = [columnN, column.index("")]
+                return(grid)
+
+        obCount = Counter(leftRightCheck) # Checking to see if Ai is 1 move away from winning in \
+        if obCount["o"] == 2 and ("" in leftRightCheck):
+            listLoc = leftRightCheck.index("")
+            if listLoc == 0:
+                grid = [0, 0]
+            elif listLoc == 1:
+                grid = [1, 1]
+            elif listLoc == 2:
+                grid = [2, 2]
+            return(grid)
+
+        obCount = Counter(rightLeftCheck)
+        if obCount["o"] == 2 and ("" in rightLeftCheck): # Checking to see if Ai is 1 move away from winning in /
+            listLoc = rightLeftCheck.index("")
+            if listLoc == 0: # Defining the locations at which "" exists
+                grid = [2, 0]
+            elif listLoc == 1:
+                grid = [1, 1]
+            elif listLoc == 2:
+                grid = [0, 2]
+            return(grid)
+
+        for rowN, row in enumerate(rowCheck):
+            obCount = Counter(row)
+            if obCount["x"] == 2 and ("" in row):  # Checking to see if player is 1 move away from winning in rows
+                grid = [row.index(""), rowN]
+                return(grid)
+
+        for columnN, column in enumerate(columnCheck):  # Checking to see if player is 1 move away from winning in
+            obCount = Counter(column)
+            if obCount["x"] == 2 and ("" in column):
+                grid = [columnN, column.index("")]
+                return(grid)
+
+        obCount = Counter(leftRightCheck)  # Checking to see if player is 1 move away from winning in \
+        if obCount["x"] == 2 and ("" in leftRightCheck):
+            listLoc = leftRightCheck.index("")
+            if listLoc == 0:
+                grid = [0, 0]
+            elif listLoc == 1:
+                grid = [1, 1]
+            elif listLoc == 2:
+                grid = [2, 2]
+            return(grid)
+
+        obCount = Counter(rightLeftCheck)
+        if obCount["x"] == 2 and ("" in rightLeftCheck):  # Checking to see if player is 1 move away from winning in /
+            listLoc = rightLeftCheck.index("")
+            if listLoc == 0:  # Defining the locations at which "" exists
+                grid = [2, 0]
+            elif listLoc == 1:
+                grid = [1, 1]
+            elif listLoc == 2:
+                grid = [0, 2]
+            return(grid)
+        # If middle not taken. take the middle
+        if gridShape[1][1] == "":
+            grid = [1, 1]
+            return(grid)
+
+        # Going to compare each corner, then each side grid in terms of the possible future wins
+        elif gridShape[1][1] != "":
+            option1 = [0, 0, 0] # Top left corner
+            option2 = [0, 0, 0] # Bottom right corner
+            option3 = [0, 0, 0] # Top right corner
+            option4 = [0, 0, 0] # Bottom left corner
+
+            option5 = [0, 0] # Top side
+            option6 = [0, 0] # Bottom side
+            option7 = [0, 0] # Left side
+            option8 = [0, 0] # Right side
+
+            if gridShape[0][0] == "": # Top left corner
+                if Counter(leftRightCheck)["x"] == 0:
+                    option1[0] = 1
+                if Counter(rowCheck[0])["x"] == 0:
+                    option1[1] = 1
+                if Counter(columnCheck[0])["x"] == 0:
+                    option1[2] = 1
+
+            if gridShape[2][2] == "": # Bottom right corner
+                if Counter(leftRightCheck)["x"] == 0:
+                    option2[0] = 1
+                if Counter(rowCheck[2])["x"] == 0:
+                    option2[1] = 1
+                if Counter(columnCheck[2])["x"] == 0:
+                    option2[2] = 1
+
+            if gridShape[0][2] == "": # Top right corner
+                if Counter(rightLeftCheck)["x"] == 0:
+                    option3[0] = 1
+                if Counter(rowCheck[0])["x"] == 0:
+                    option3[1] = 1
+                if Counter(columnCheck[2])["x"] == 0:
+                    option3[2] = 1
+
+            if gridShape[2][0] == "": # Bottom left corner
+                if Counter(rightLeftCheck)["x"] == 0:
+                    option4[0] = 1
+                if Counter(rowCheck[2])["x"] == 0:
+                    option4[1] = 1
+                if Counter(columnCheck[0])["x"] == 0:
+                    option4[2] = 1.
+            # Comparing options to decide which has a higher probability of having a higher advantage of winning
+
+            if gridShape[0][1] == "": # Top side
+                if Counter(rowCheck[0])["x"] == 0:
+                    option5[0] = 1
+                if Counter(columnCheck[1])["x"] == 0:
+                    option5[1] = 1
+
+            if gridShape[2][1] == "": # Bottom side
+                if Counter(rowCheck[2])["x"] == 0:
+                    option6[0] = 1
+                if Counter(columnCheck[1])["x"] == 0:
+                    option6[1] = 1
+
+            if gridShape[1][0] == "": # Left side
+                if Counter(rowCheck[1])["x"] == 0:
+                    option7[0] = 1
+                if Counter(columnCheck[0])["x"] == 0:
+                    option7[1] = 1
+
+            if gridShape[1][2] == "": # Right side
+                if Counter(rowCheck[1])["x"] == 0:
+                    option8[0] = 1
+                if Counter(columnCheck[2])["x"] == 0:
+                    option8[1] = 1
+
+            if max([sum(option1), sum(option2), sum(option3), sum(option4)]) != 0:
+                if sum(option1) >= sum(option2) and sum(option1) >= sum(option3) and sum(option1) >= sum(option4):
+                    grid = [0, 0]
+                elif sum(option2) >= sum(option1) and sum(option2) >= sum(option3) and sum(option2) >= sum(option4):
+                    grid = [2, 2]
+                elif sum(option3) >= sum(option1) and sum(option3) >= sum(option2) and sum(option3) >= sum(option4):
+                    grid = [2, 0]
+                elif sum(option4) >= sum(option1) and sum(option4) >= sum(option2) and sum(option4) >= sum(option3):
+                    grid = [0, 2]
+                return(grid)
+
+            if max([sum(option5), sum(option6), sum(option7), sum(option8)]) != 0:
+                if sum(option5) >= sum(option6) and sum(option5) >= sum(option7) and sum(option5) >= sum(option8):
+                    grid = [0, 1]
+                elif sum(option6) >= sum(option5) and sum(option6) >= sum(option7) and sum(option6) >= sum(option8):
+                    grid = [2, 1]
+                elif sum(option7) >= sum(option5) and sum(option7) >= sum(option6) and sum(option7) >= sum(option8):
+                    grid = [1, 0]
+                elif sum(option8) >= sum(option5) and sum(option8) >= sum(option6) and sum(option8) >= sum(option7):
+                    grid = [1, 2]
+                return(grid)
+
+            else:
+                for y in range(3):
+                    for x in range(3):
+                        if gridShape[y][x] == "":
+                            return(x, y)
 
 #Translates xy coords to  grid coords
 def gridCalc(x, y):
