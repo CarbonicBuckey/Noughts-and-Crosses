@@ -341,38 +341,59 @@ def priorities():
                 if Counter(columnCheck[2])["x"] == 0:
                     option8[1] = 1
 
+            #Acounging for 2 middle grids of adjacent sides being filled
+            if rowCheck[0][1] == "x" and columnCheck[0][1] == "x" and gridShape[0][0] == "":
+                grid = [0, 0]
+                return(grid)
+
+            if rowCheck[0][1] == "x" and columnCheck[2][1] == "x" and gridShape[0][2] == "":
+                grid = [2, 0]
+                return (grid)
+
+            if rowCheck[2][1] == "x" and columnCheck[0][1] == "x" and gridShape[2][0] == "":
+                grid = [0, 2]
+                return (grid)
+
+            if rowCheck[2][1] == "x" and columnCheck[2][1] == "x" and gridShape[2][2] == "":
+                grid = [2, 2]
+                return (grid)
+
             #AI can be defeated when player has one x in each adjacent side. Accounting for this.
             #Top and left
             if Counter(rowCheck[0])["x"] == 1 and Counter(columnCheck[0])["x"] == 1 and (gridShape[0][1] == "" or gridShape[1][0] == ""):
                 if sum(option5) >= sum(option7):#If the top side has more options
                     grid = [1, 0]
+                    return (grid)
                 if sum(option7) >= sum(option5):
                     grid = [0, 1]
-                return(grid)
+                    return (grid)
 
             #Top and right
             if Counter(rowCheck[0])["x"] == 1 and Counter(columnCheck[2])["x"] == 1 and (gridShape[0][1] == "" or gridShape[1][2] == ""):
-                if sum(option5) >= sum(option7):#If the top side has more options
+                if sum(option5) >= sum(option8):#If the top side has more options
                     grid = [1, 0]
-                if sum(option7) >= sum(option5):
+                    return (grid)
+                if sum(option8) >= sum(option5):
                     grid = [2, 1]
-                return(grid)
+                    return (grid)
 
             #Bottom and Left
             if Counter(rowCheck[2])["x"] == 1 and Counter(columnCheck[0])["x"] == 1 and (gridShape[2][1] == "" or gridShape[1][0] == ""):
-                if sum(option5) >= sum(option7):#If the top side has more options
+                if sum(option6) >= sum(option7):#If the top side has more options
                     grid = [1, 2]
-                if sum(option7) >= sum(option5):
+                    return (grid)
+                if sum(option7) >= sum(option6):
                     grid = [0, 1]
-                return(grid)
+                    return (grid)
 
             #Bottom and right
             if Counter(rowCheck[2])["x"] == 1 and Counter(columnCheck[2])["x"] == 1 and (gridShape[2][1] == "" or gridShape[1][2] == ""):
-                if sum(option5) >= sum(option7):#If the top side has more options
+                if sum(option6) >= sum(option8):#If the top side has more options
                     grid = [1, 2]
-                if sum(option7) >= sum(option5):
+                    return (grid)
+                if sum(option8) >= sum(option6):
                     grid = [2, 1]
-                return(grid)
+                    return(grid)
 
             if max([sum(option1), sum(option2), sum(option3), sum(option4)]) != 0:
                 if sum(option1) >= sum(option2) and sum(option1) >= sum(option3) and sum(option1) >= sum(option4):
