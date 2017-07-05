@@ -362,10 +362,10 @@ def priorities():
             #Top and left
             if Counter(rowCheck[0])["x"] == 1 and Counter(columnCheck[0])["x"] == 1 and (gridShape[0][1] == "" or gridShape[1][0] == ""):
                 if sum(option5) >= sum(option7):#If the top side has more options
-                    grid = [1, 0]
+                    grid = [0, 1]
                     return (grid)
                 if sum(option7) >= sum(option5):
-                    grid = [0, 1]
+                    grid = [1, 0]
                     return (grid)
 
             #Top and right
@@ -398,24 +398,30 @@ def priorities():
             if max([sum(option1), sum(option2), sum(option3), sum(option4)]) != 0:
                 if sum(option1) >= sum(option2) and sum(option1) >= sum(option3) and sum(option1) >= sum(option4):
                     grid = [0, 0]
+                    return (grid)
                 elif sum(option2) >= sum(option1) and sum(option2) >= sum(option3) and sum(option2) >= sum(option4):
                     grid = [2, 2]
+                    return (grid)
                 elif sum(option3) >= sum(option1) and sum(option3) >= sum(option2) and sum(option3) >= sum(option4):
                     grid = [2, 0]
+                    return (grid)
                 elif sum(option4) >= sum(option1) and sum(option4) >= sum(option2) and sum(option4) >= sum(option3):
                     grid = [0, 2]
-                return(grid)
+                    return(grid)
 
             if max([sum(option5), sum(option6), sum(option7), sum(option8)]) != 0:
                 if sum(option5) >= sum(option6) and sum(option5) >= sum(option7) and sum(option5) >= sum(option8):
                     grid = [0, 1]
+                    return (grid)
                 elif sum(option6) >= sum(option5) and sum(option6) >= sum(option7) and sum(option6) >= sum(option8):
                     grid = [2, 1]
+                    return (grid)
                 elif sum(option7) >= sum(option5) and sum(option7) >= sum(option6) and sum(option7) >= sum(option8):
                     grid = [1, 0]
+                    return (grid)
                 elif sum(option8) >= sum(option5) and sum(option8) >= sum(option6) and sum(option8) >= sum(option7):
                     grid = [1, 2]
-                return(grid)
+                    return(grid)
 
             else:
                 for y in range(3):
