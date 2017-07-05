@@ -273,7 +273,25 @@ def priorities():
             grid = [1, 1]
             return(grid)
 
-        # Going to compare each corner, then each side grid in terms of the possible future wins
+        # Accounting for 2 middle grids of adjacent sides being filled, which can result in player win
+        if rowCheck[0][1] == "x" and columnCheck[0][1] == "x" and gridShape[0][0] == "":
+            grid = [0, 0]
+            return (grid)
+
+        if rowCheck[0][1] == "x" and columnCheck[2][1] == "x" and gridShape[0][2] == "":
+            grid = [2, 0]
+            return (grid)
+
+        if rowCheck[2][1] == "x" and columnCheck[0][1] == "x" and gridShape[2][0] == "":
+            grid = [0, 2]
+            return (grid)
+
+        if rowCheck[2][1] == "x" and columnCheck[2][1] == "x" and gridShape[2][2] == "":
+            grid = [2, 2]
+            return (grid)
+
+        # Going to compare each corner, then each side grid in terms of the possible future wins. Then choose the side
+        # With the highest chance of wins
         elif gridShape[1][1] != "":
             option1 = [0, 0, 0] # Top left corner
             option2 = [0, 0, 0] # Bottom right corner
@@ -341,25 +359,8 @@ def priorities():
                 if Counter(columnCheck[2])["x"] == 0:
                     option8[1] = 1
 
-            #Acounging for 2 middle grids of adjacent sides being filled
-            if rowCheck[0][1] == "x" and columnCheck[0][1] == "x" and gridShape[0][0] == "":
-                grid = [0, 0]
-                return(grid)
-
-            if rowCheck[0][1] == "x" and columnCheck[2][1] == "x" and gridShape[0][2] == "":
-                grid = [2, 0]
-                return (grid)
-
-            if rowCheck[2][1] == "x" and columnCheck[0][1] == "x" and gridShape[2][0] == "":
-                grid = [0, 2]
-                return (grid)
-
-            if rowCheck[2][1] == "x" and columnCheck[2][1] == "x" and gridShape[2][2] == "":
-                grid = [2, 2]
-                return (grid)
-
-            #AI can be defeated when player has one x in each adjacent side. Accounting for this.
-            #Top and left
+            # AI can be defeated when player has one x in each adjacent side. Accounting for this.
+            # Top and left
             if Counter(rowCheck[0])["x"] == 1 and Counter(columnCheck[0])["x"] == 1 and (gridShape[0][1] == "" or gridShape[1][0] == ""):
                 if sum(option5) >= sum(option7):#If the top side has more options
                     grid = [0, 1]
@@ -368,7 +369,7 @@ def priorities():
                     grid = [1, 0]
                     return (grid)
 
-            #Top and right
+            # Top and right
             if Counter(rowCheck[0])["x"] == 1 and Counter(columnCheck[2])["x"] == 1 and (gridShape[0][1] == "" or gridShape[1][2] == ""):
                 if sum(option5) >= sum(option8):#If the top side has more options
                     grid = [1, 0]
@@ -377,7 +378,7 @@ def priorities():
                     grid = [2, 1]
                     return (grid)
 
-            #Bottom and Left
+            # Bottom and Left
             if Counter(rowCheck[2])["x"] == 1 and Counter(columnCheck[0])["x"] == 1 and (gridShape[2][1] == "" or gridShape[1][0] == ""):
                 if sum(option6) >= sum(option7):#If the top side has more options
                     grid = [1, 2]
@@ -386,7 +387,7 @@ def priorities():
                     grid = [0, 1]
                     return (grid)
 
-            #Bottom and right
+            # Bottom and right
             if Counter(rowCheck[2])["x"] == 1 and Counter(columnCheck[2])["x"] == 1 and (gridShape[2][1] == "" or gridShape[1][2] == ""):
                 if sum(option6) >= sum(option8):#If the top side has more options
                     grid = [1, 2]
@@ -395,6 +396,7 @@ def priorities():
                     grid = [2, 1]
                     return(grid)
 
+    # If none of the scenarios above apply, compare choices based on the number of wins that taking that grid can offer
             if max([sum(option1), sum(option2), sum(option3), sum(option4)]) != 0:
                 if sum(option1) >= sum(option2) and sum(option1) >= sum(option3) and sum(option1) >= sum(option4):
                     grid = [0, 0]
@@ -409,6 +411,7 @@ def priorities():
                     grid = [0, 2]
                     return(grid)
 
+            # Corners will most likely be favorable, but if none of them are valid options, go for the sides
             if max([sum(option5), sum(option6), sum(option7), sum(option8)]) != 0:
                 if sum(option5) >= sum(option6) and sum(option5) >= sum(option7) and sum(option5) >= sum(option8):
                     grid = [0, 1]
@@ -423,6 +426,7 @@ def priorities():
                     grid = [1, 2]
                     return(grid)
 
+        # If there are no favorable anything, is most likely going to be tied game, just take the first grid available.
             else:
                 for y in range(3):
                     for x in range(3):
