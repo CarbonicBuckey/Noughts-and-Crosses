@@ -369,8 +369,6 @@ def priorities():
             if Counter(rowCheck[0])["x"] == 1 and Counter(columnCheck[0])["x"] == 1 and (gridShape[0][1] == "" or gridShape[1][0] == ""):
                 if max(sum(option5), sum(option7)) != 0:
                     if sum(option5) >= sum(option7):#If the top side has more options
-                        print(2)
-                        print(option5, option7)
                         grid = [1, 0]
                         return (grid)
                     if sum(option7) >= sum(option5):
@@ -381,7 +379,6 @@ def priorities():
             if Counter(rowCheck[0])["x"] == 1 and Counter(columnCheck[2])["x"] == 1 and (gridShape[0][1] == "" or gridShape[1][2] == ""):
                 if max(sum(option5), sum(option8)) != 0:
                     if sum(option5) >= sum(option8) and max(sum(option5), sum(option8)):#If the top side has more options
-                        print(3)
                         grid = [1, 0]
                         return (grid)
                     if sum(option8) >= sum(option5) and max(sum(option5), sum(option8)):
@@ -432,7 +429,6 @@ def priorities():
                     grid = [2, 1]
                     return (grid)
                 elif sum(option7) >= sum(option5) and sum(option7) >= sum(option6) and sum(option7) >= sum(option8):
-                    print(1)
                     grid = [1, 0]
                     return (grid)
                 elif sum(option8) >= sum(option5) and sum(option8) >= sum(option6) and sum(option8) >= sum(option7):
