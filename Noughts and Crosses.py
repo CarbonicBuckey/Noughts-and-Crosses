@@ -512,65 +512,28 @@ def objectLoc(grid):
         return(pointX)
 
 def gameChecker(grid):
-    x = grid[0]
-    y = grid[1]
 
-    # checking basic row win
-    if gridShape[y] == ["x", "x", "x"] or gridShape[y] == ["o", "o", "o"]:
-        canvas.create_text([250, 250], text="Player {} wins!".format(turn), fill="#ee1fd0",
-                           font="CentryGothic 50 bold")
+    rowCheck = [gridShape[0], gridShape[1], gridShape[2]]
+    columnCheck = [list(x) for x in zip(rowCheck[0], rowCheck[1], rowCheck[2])]
+    leftRightCheck = [gridShape[0][0], gridShape[1][1], gridShape[2][2]]
+    rightLeftCheck = [gridShape[0][2], gridShape[1][1], gridShape[2][0]]
+
+    allCheck = []
+    allCheck.extend(rowCheck)
+    allCheck.extend(columnCheck)
+    allCheck.append(leftRightCheck)
+    allCheck.append(rightLeftCheck)
+
+    if ["x", "x", "x"] in allCheck or ["o", "o", "o"] in allCheck:
+        canvas.create_text([250, 250], text="Player {} wins!".format(turn), fill="#ee1fd0",font="CentryGothic 50 bold")
         canvas.create_text([250, 300], text="Please Click to Continue", fill="#ee1fd0", font="centrygothic 20 bold")
-
         return ("fin")
-
-    # checking for all other types of wins
+    elif "" not in rowCheck[0] and "" not in rowCheck[1] and "" not in rowCheck[2]:
+        canvas.create_text([250, 250], text="Tied Game!", fill="#ee1fd0", font="CentryGothic 50 bold")
+        canvas.create_text([250, 300], text="Please Click to Continue", fill="#ee1fd0", font="centrygothic 20 bold")
+        return ("fin")
     else:
-
-        # defining the rows such that all rows are defined in terms of y
-        if y == 0:
-            y2 = 1
-            y3 = 2
-        elif y == 1:
-            y2 = 0
-            y3 = 2
-        elif y == 2:
-            y2 = 0
-            y3 = 1
-
-        # checking to see if all objects in the same position in each row is the same
-        if gridShape[y][x] == gridShape[y2][x] == gridShape[y3][x] != "":
-            canvas.create_text([250, 250], text="Player {} wins!".format(turn), fill="#ee1fd0",
-                               font="CentryGothic 50 bold")
-            canvas.create_text([250, 300], text="Please Click to Continue", fill="#ee1fd0",
-                               font="centrygothic 20 bold")
-
-            return ("fin")  # returning a value to confirm that the game's outcome has been decided
-
-        elif gridShape[0][0] == gridShape[1][1] == gridShape[2][2] != "":
-            canvas.create_text([250, 250], text="Player {} wins!".format(turn), fill="#ee1fd0",
-                               font="CentryGothic 50 bold")
-            canvas.create_text([250, 300], text="Please Click to Continue", fill="#ee1fd0",
-                               font="centrygothic 20 bold")
-
-            return ("fin")
-
-        elif gridShape[0][2] == gridShape[1][1] == gridShape[2][0] != "":
-            canvas.create_text([250, 250], text="Player {} wins!".format(turn), fill="#ee1fd0",
-                               font="CentryGothic 50 bold")
-            canvas.create_text([250, 300], text="Please Click to Continue", fill="#ee1fd0",
-                               font="centrygothic 20 bold")
-
-            return ("fin")
-
-
-        elif "" not in gridShape[0] and "" not in gridShape[1] and "" not in gridShape[2]:
-            canvas.create_text([250, 250], text="Tied Game!", fill="#ee1fd0", font="CentryGothic 50 bold")
-            canvas.create_text([250, 300], text="Please Click to Continue", fill="#ee1fd0",
-                               font="centrygothic 20 bold")
-
-            return ("fin")
-
-        else:
-            return (None)  # Do not return anything if none of the conditions are true
+        return(None)
+    
 main()
 
