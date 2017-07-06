@@ -10,7 +10,7 @@ mode = "Player vs Player"
 
 #main function that will set up the window
 def main():
-    global canvas
+    global canvas, window
     #Initialising window
     window = Tk()
     window.title("Noughts and Crosses")
@@ -19,11 +19,13 @@ def main():
     sideFrame = Frame(window)
 
     #Setting up objects inside frame
-    modeButton = Button(sideFrame, text="Change Mode", width=15, command=modeToggle)
-    clearButton = Button(sideFrame, text="Clear", width=15, command=init)
+    modeButton = Button(sideFrame, text="Change Mode", width=15, bg="#99ff99", activebackground="#00ff00", command=modeToggle)
+    clearButton = Button(sideFrame, text="Clear", width=15, bg="#9999ff", activebackground="#5555ff", command=init)
+    quitButton = Button(sideFrame, text="Quit", width=15, bg="#ff9999", activebackground="#ff0000", command=suspend)
 
     modeButton.pack()
     clearButton.pack()
+    quitButton.pack()
 
     #Setting up the canvas
     canvas = Canvas(window, width=500, height=500, bg="#77eeff")
@@ -96,6 +98,9 @@ def clear():
     gridShape = [["","",""],["","",""],["","",""]]
 
     canvas.delete(ALL)
+
+def suspend():
+    window.destroy()
 
 def hoverLoc(motion):
     #Defining x and y
@@ -362,39 +367,46 @@ def priorities():
             # AI can be defeated when player has one x in each adjacent side. Accounting for this.
             # Top and left
             if Counter(rowCheck[0])["x"] == 1 and Counter(columnCheck[0])["x"] == 1 and (gridShape[0][1] == "" or gridShape[1][0] == ""):
-                if sum(option5) >= sum(option7):#If the top side has more options
-                    grid = [0, 1]
-                    return (grid)
-                if sum(option7) >= sum(option5):
-                    grid = [1, 0]
-                    return (grid)
+                if max(sum(option5), sum(option7)) != 0:
+                    if sum(option5) >= sum(option7):#If the top side has more options
+                        print(2)
+                        print(option5, option7)
+                        grid = [1, 0]
+                        return (grid)
+                    if sum(option7) >= sum(option5):
+                        grid = [0, 1]
+                        return (grid)
 
             # Top and right
             if Counter(rowCheck[0])["x"] == 1 and Counter(columnCheck[2])["x"] == 1 and (gridShape[0][1] == "" or gridShape[1][2] == ""):
-                if sum(option5) >= sum(option8):#If the top side has more options
-                    grid = [1, 0]
-                    return (grid)
-                if sum(option8) >= sum(option5):
-                    grid = [2, 1]
-                    return (grid)
+                if max(sum(option5), sum(option8)) != 0:
+                    if sum(option5) >= sum(option8) and max(sum(option5), sum(option8)):#If the top side has more options
+                        print(3)
+                        grid = [1, 0]
+                        return (grid)
+                    if sum(option8) >= sum(option5) and max(sum(option5), sum(option8)):
+                        grid = [2, 1]
+                        return (grid)
 
             # Bottom and Left
             if Counter(rowCheck[2])["x"] == 1 and Counter(columnCheck[0])["x"] == 1 and (gridShape[2][1] == "" or gridShape[1][0] == ""):
-                if sum(option6) >= sum(option7):#If the top side has more options
-                    grid = [1, 2]
-                    return (grid)
-                if sum(option7) >= sum(option6):
-                    grid = [0, 1]
-                    return (grid)
+                if max(sum(option6), sum(option7)) != 0:
+                    if sum(option6) >= sum(option7):#If the top side has more options
+                        grid = [1, 2]
+                        return (grid)
+                    if sum(option7) >= sum(option6):
+                        grid = [0, 1]
+                        return (grid)
 
             # Bottom and right
             if Counter(rowCheck[2])["x"] == 1 and Counter(columnCheck[2])["x"] == 1 and (gridShape[2][1] == "" or gridShape[1][2] == ""):
-                if sum(option6) >= sum(option8):#If the top side has more options
-                    grid = [1, 2]
-                    return (grid)
-                if sum(option8) >= sum(option6):
-                    grid = [2, 1]
-                    return(grid)
+                if max(sum(option6), sum(option8)) != 0:
+                    if sum(option6) >= sum(option8):#If the top side has more options
+                        grid = [1, 2]
+                        return (grid)
+                    if sum(option8) >= sum(option6):
+                        grid = [2, 1]
+                        return(grid)
 
     # If none of the scenarios above apply, compare choices based on the number of wins that taking that grid can offer
             if max([sum(option1), sum(option2), sum(option3), sum(option4)]) != 0:
@@ -420,6 +432,7 @@ def priorities():
                     grid = [2, 1]
                     return (grid)
                 elif sum(option7) >= sum(option5) and sum(option7) >= sum(option6) and sum(option7) >= sum(option8):
+                    print(1)
                     grid = [1, 0]
                     return (grid)
                 elif sum(option8) >= sum(option5) and sum(option8) >= sum(option6) and sum(option8) >= sum(option7):
