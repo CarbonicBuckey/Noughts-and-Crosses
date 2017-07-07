@@ -378,10 +378,10 @@ def priorities():
             # Top and right
             if Counter(rowCheck[0])["x"] == 1 and Counter(columnCheck[2])["x"] == 1 and (gridShape[0][1] == "" or gridShape[1][2] == ""):
                 if max(sum(option5), sum(option8)) != 0:
-                    if sum(option5) >= sum(option8) and max(sum(option5), sum(option8)):#If the top side has more options
+                    if sum(option5) >= sum(option8):#If the top side has more options
                         grid = [1, 0]
                         return (grid)
-                    if sum(option8) >= sum(option5) and max(sum(option5), sum(option8)):
+                    if sum(option8) >= sum(option5):
                         grid = [2, 1]
                         return (grid)
 
